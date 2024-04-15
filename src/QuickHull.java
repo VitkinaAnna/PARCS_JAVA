@@ -90,24 +90,6 @@ public class QuickHull implements AM {
 
         return hullPoints;
     }
-	 
-	public static ArrayList<ArrayList<Integer>> computeHash(String str) {
-		 ArrayList<ArrayList<Integer>> points = new ArrayList<>(Arrays.asList(
-                new ArrayList<>(Arrays.asList(0, 0)),
-                new ArrayList<>(Arrays.asList(0, 0))
-       		 ));
-		 BigInteger hashValue = BigInteger.ZERO;
-	     BigInteger powBase = BigInteger.ONE;
-
-	     for (int i = 0; i < str.length(); i++) {
-	    	 char ch = str.charAt(i);
-	         BigInteger charValue = BigInteger.valueOf(ch - 'a' + 1);
-	         hashValue = (hashValue.add(charValue.multiply(powBase).mod(MODULE))).mod(MODULE);
-	         powBase = powBase.multiply(BASE).mod(MODULE);
-	        }
-	        return points;
-	 }
-
 
     public static void main(String[] args) throws Exception {
     	
