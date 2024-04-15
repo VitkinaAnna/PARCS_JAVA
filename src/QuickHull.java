@@ -183,18 +183,4 @@ public class QuickHull implements AM {
         info.parent.write(subhash);
   
     }
-
-    public static BigInteger resultСalculation(BigInteger[] subhash, int sublen) {
-        
-        BigInteger delt = BigInteger.ONE;
-        BigInteger step = BASE.modPow(BigInteger.valueOf(sublen), MODULE);
-        BigInteger output = BigInteger.ZERO;
-        
-        for (BigInteger x : subhash) {
-	     System.out.println(x.toString());
-            output = output.add(x.multiply(delt).mod(MODULE)).mod(MODULE);
-            delt = delt.multiply(step).mod(MODULE);
-        }
-       return output;
-    }
 }
