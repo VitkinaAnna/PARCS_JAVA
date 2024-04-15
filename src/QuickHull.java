@@ -131,35 +131,50 @@ public class QuickHull implements AM {
 	
 
         System.err.println("Forwarding parts to workers...");
+	    int numPoints = points.size();
+	    int pointsPerWorker = numPoints / n;
+	    int extraPoints = numPoints % n;
+	    
        startTime = System.nanoTime();
         channel[] channels = new channel[n];
         for (int i = 0; i < n; i++) {
-           // String substring = "";
-	   // if (i * sub_len < S.length()) {
-	//	substring = S.substring(i * sub_len, 
-           // 		Math.min((i * sub_len + sub_len), S.length()));
-	//	}
+	    ArrayList<ArrayList<Integer>> partPoints = new ArrayList<>();
+	    int start = i * pointsPerWorker + Math.min(i, extraPoints);
+	    int end = start + pointsPerWorker + (i < extraPoints ? 1 : 0);
+	    partPoints.addAll(points.subList(start, end));
+	            
             point p = info.createPoint();
             channel c = p.createChannel();
             p.execute("QuickHull");
-            c.write(points);
+            c.write(partPoints);
             channels[i] = c;
         }
 
         System.err.println("Getting results");
-        ArrayList<ArrayList<Integer>>[] sub_hash = new ArrayList[n];
+        ArrayList<ArrayList<Integer>>[] hulls = new ArrayList[n];
 
         for (int i = 0; i < n; i++) {
-        	sub_hash[i] = (ArrayList<ArrayList<Integer>>) channels[i].readObject();
-		// Printing the initialized 2x2 ArrayList
-        	for (ArrayList<Integer> row : sub_hash[i]) {
-        	    System.err.println(row);
-     		   }
+        	hulls[i] = (ArrayList<ArrayList<Integer>>) channels[i].readObject();
         }
 
         System.err.println("Calculation of the result");
      
-        //BigInteger hash = resultСalculation(sub_hash, sub_len);
+        HashSet<ArrayList<Integer>> uniquePointsSet = new HashSet<>();
+
+	for (int i = 0; i < n; i++) {
+	    for (ArrayList<Integer> point : hulls[i]) {
+	        uniquePointsSet.add(point);
+	    }
+	}
+	ArrayList<ArrayList<Integer>> points_combined = new ArrayList<>(uniquePointsSet);
+	// Compute convex hull on combined points
+        ArrayList<ArrayList<Integer>> finalHull = printHull(points_combined);
+
+        // Print combined convex hull
+        System.out.println("Combined Convex Hull:");
+        for (ArrayList<Integer> point : finalHull) {
+            System.err.println("(" + point.get(0) + ", " + point.get(1) + ")");
+        }
        
  	long endTime = System.nanoTime();
 	
