@@ -157,8 +157,8 @@ public class QuickHull implements AM {
         }
 
         System.err.println("Getting results");
-      
-        BigInteger[] sub_hash = new BigInteger[n];
+        ArrayList<ArrayList<Integer>>[] sub_hash = new ArrayList[n];
+
         for (int i = 0; i < n; i++) {
         	sub_hash[i] = (ArrayList<ArrayList<Integer>>) channels[i].readObject();
 		// Printing the initialized 2x2 ArrayList
