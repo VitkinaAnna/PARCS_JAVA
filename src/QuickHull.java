@@ -14,8 +14,6 @@ import java.util.Set;
 
 public class QuickHull implements AM {
     private static long startTime = 0;
-    private static final BigInteger MODULE = new BigInteger("2147483647");
-    private static final BigInteger BASE =  new BigInteger("31");
         public static int findSide(ArrayList<Integer> p1, ArrayList<Integer> p2, ArrayList<Integer> p) {
         int val = (p.get(1) - p1.get(1)) * (p2.get(0) - p1.get(0)) - (p2.get(1) - p1.get(1)) * (p.get(0) - p1.get(0));
 
@@ -130,29 +128,39 @@ public class QuickHull implements AM {
         System.err.println("Reading input...");
        
         
-	String S = "";
-	try{
-		Scanner sc = new Scanner(new File(info.curtask.findFile("input.txt")));
-		S = sc.nextLine();
+	ArrayList<ArrayList<Integer>> points = new ArrayList<>();
+
+	try {
+	    Scanner sc = new Scanner(new File(info.curtask.findFile("input.txt")));
+	    while (sc.hasNextLine()) {
+	        String line = sc.nextLine();
+	        String[] coordinates = line.split(",");
+	        ArrayList<Integer> point = new ArrayList<>();
+	        for (String coord : coordinates) {
+	            point.add(Integer.parseInt(coord.trim()));
+	        }
+	        points.add(point);
+	    }
+	    sc.close(); 
+	} catch (IOException e) {
+	    e.printStackTrace();
+	    return;
 	}
-	catch (IOException e) {e.printStackTrace(); return;}
-        
-        int len = S.length();
-        int sub_len = (len + n - 1) / n;
+	
 
         System.err.println("Forwarding parts to workers...");
        startTime = System.nanoTime();
         channel[] channels = new channel[n];
         for (int i = 0; i < n; i++) {
-            String substring = "";
-	    if (i * sub_len < S.length()) {
-		substring = S.substring(i * sub_len, 
-            		Math.min((i * sub_len + sub_len), S.length()));
-		}
+           // String substring = "";
+	   // if (i * sub_len < S.length()) {
+	//	substring = S.substring(i * sub_len, 
+           // 		Math.min((i * sub_len + sub_len), S.length()));
+	//	}
             point p = info.createPoint();
             channel c = p.createChannel();
             p.execute("QuickHull");
-            c.write(substring);
+            c.write(points);
             channels[i] = c;
         }
 
@@ -187,8 +195,8 @@ public class QuickHull implements AM {
 
     public void run(AMInfo info) {
      
-        String substring = (String)info.parent.readObject();
-         ArrayList<ArrayList<Integer>> subhash = computeHash(substring);
+         ArrayList<ArrayList<Integer>> substring = (ArrayList<ArrayList<Integer>>)info.parent.readObject();
+         ArrayList<ArrayList<Integer>> subhash = printHull(substring);
 
         info.parent.write(subhash);
   
